@@ -52,6 +52,11 @@ pipeline {
         // ── 2. INSTALL DEPENDENCIES ──────────────────────────────────────────
         stage('Install Dependencies') {
             steps {
+                // Point xcode-select at the full Xcode.app (Command Line Tools alone cannot run xcodebuild)
+                sh '''
+                    XCODE_APP=$(find /Applications -maxdepth 1 -name "Xcode*.app" -type d | sort -r | head -1)
+                    [ -n "$XCODE_APP" ] && sudo xcode-select -s "$XCODE_APP/Contents/Developer" && xcode-select -p
+                '''
                 sh '[ -f Podfile ] && pod install --repo-update || echo "No Podfile found — skipping CocoaPods install"'
             }
         }
