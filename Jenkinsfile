@@ -27,7 +27,6 @@ pipeline {
             artifactNumToKeepStr:  '-1'
         ))
         timeout(time: 2, unit: 'HOURS')
-        timestamps()
     }
 
     // These variables are injected by the MultiBranch folder
@@ -65,11 +64,10 @@ pipeline {
                     cleanBeforeBuild:    true,
                     configuration:       'Debug',
                     target:              "${XCODE_SCHEME}",
-                    xcWorkspacePath:     "${XCODE_WORKSPACE}",
+                    xcodeWorkspaceFile:  "${XCODE_WORKSPACE}",
                     sdk:                 'iphonesimulator',
                     buildDir:            "${OUTPUT_DIR}",
                     developmentTeamName: '',
-                    codeSigningRequired: false,
                     signingMethod:       'nosign'
                 )
             }
@@ -82,11 +80,10 @@ pipeline {
                     cleanBeforeBuild:    false,
                     configuration:       'Debug',
                     target:              "${XCODE_SCHEME}",
-                    xcWorkspacePath:     "${XCODE_WORKSPACE}",
+                    xcodeWorkspaceFile:  "${XCODE_WORKSPACE}",
                     sdk:                 'iphonesimulator',
                     buildDir:            "${OUTPUT_DIR}",
                     developmentTeamName: '',
-                    codeSigningRequired: false,
                     signingMethod:       'nosign',
                     xcodebuildArguments: "test -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' -enableCodeCoverage YES"
                 )
@@ -117,7 +114,7 @@ pipeline {
                     cleanBeforeBuild:    true,
                     configuration:       'Release',
                     target:              "${XCODE_SCHEME}",
-                    xcWorkspacePath:     "${XCODE_WORKSPACE}",
+                    xcodeWorkspaceFile:  "${XCODE_WORKSPACE}",
                     sdk:                 'iphoneos',
                     buildDir:            "${OUTPUT_DIR}",
                     signingMethod:       'manual',
@@ -140,9 +137,9 @@ pipeline {
             steps {
                 // ExportOptions.plist must be committed to the repository root
                 exportIpa(
-                    xcArchivePath:       "${OUTPUT_DIR}/Wikipedia.xcarchive",
-                    exportPath:          "${OUTPUT_DIR}",
-                    exportOptionsPlist:  'ExportOptions.plist'
+                    archiveDir:          "${OUTPUT_DIR}",
+                    keychainPath:        "${OUTPUT_DIR}",
+                    ipaExportMethod:     'ad-hoc'
                 )
                 archiveArtifacts artifacts: 'build/output/*.ipa', fingerprint: true
             }
