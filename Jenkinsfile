@@ -52,7 +52,7 @@ pipeline {
         // ── 2. INSTALL DEPENDENCIES ──────────────────────────────────────────
         stage('Install Dependencies') {
             steps {
-                sh 'pod install --repo-update'
+                sh '[ -f Podfile ] && pod install --repo-update || echo "No Podfile found — skipping CocoaPods install"'
             }
         }
 
@@ -175,7 +175,7 @@ pipeline {
         always {
             // Re-lock keychain regardless of build outcome
             sh 'security lock-keychain ~/Library/Keychains/login.keychain-db || true'
-            cleanWs()
+            deleteDir()
         }
         failure {
             echo "Build FAILED — branch: ${env.BRANCH_NAME}, build: ${env.BUILD_NUMBER}"
